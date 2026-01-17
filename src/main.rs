@@ -1,6 +1,9 @@
-use std::{f64, str::FromStr};
-
+use image::ColorType;
+use image::ImageError;
+use image::ImageReader;
 use num_complex::Complex;
+use std::io::Cursor;
+use std::{f64, fs::File, str::FromStr};
 
 fn escape_time(c: Complex<f64>, limit: usize) -> Option<usize> {
     let mut z = Complex { re: 0.0, im: 0.0 };
@@ -77,6 +80,18 @@ fn render(
             }
         }
     }
+}
+
+/// Write pixels buffer with dimension bounds into file_name
+fn write_image(file_name: &str, pixels: &[u8], bounds: (usize, usize)) -> Result<(), ImageError> {
+    image::save_buffer(
+        file_name,
+        pixels,
+        bounds.0 as u32,
+        bounds.1 as u32,
+        ColorType::L8,
+    )?;
+    Ok(())
 }
 
 fn main() {
