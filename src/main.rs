@@ -36,6 +36,26 @@ fn parse_complex(s: &str) -> Option<Complex<f64>> {
     }
 }
 
+/// Convert RowxCol of img -> XxY on the complex plane
+/// `bounds`: width and height of img in pixels
+/// `pixel`: (col, row) of the point on img in pixels
+/// `upper_left` and `lower_right`: determines the region of the complex plane that the image covers
+fn pixel_to_point(
+    bounds: (usize, usize),
+    pixel: (usize, usize),
+    upper_left: Complex<f64>,
+    lower_right: Complex<f64>,
+) -> Complex<f64> {
+    let (width, height) = (
+        lower_right.re - upper_left.re,
+        upper_left.im - lower_right.im,
+    );
+    Complex {
+        re: upper_left.re + pixel.0 as f64 * width / bounds.0 as f64,
+        im: upper_left.im - pixel.1 as f64 * height / bounds.1 as f64,
+    }
+}
+
 fn main() {
     println!("Hello, world!");
 }
@@ -55,5 +75,21 @@ fn test_parse_complex_num() {
     assert_eq!(
         parse_complex("-8,17.5"),
         Some(Complex::<f64> { re: -8.0, im: 17.5 })
+    );
+}
+
+#[test]
+fn test_pixel_to_point() {
+    assert_eq!(
+        pixel_to_point(
+            (100, 200),
+            (25, 175),
+            Complex { re: -1.0, im: 1.0 },
+            Complex { re: 1.0, im: -1.0 }
+        ),
+        Complex {
+            re: -0.5,
+            im: -0.75
+        }
     );
 }
