@@ -1,9 +1,8 @@
 use image::ColorType;
 use image::ImageError;
-use image::ImageReader;
 use num_complex::Complex;
-use std::io::Cursor;
-use std::{f64, fs::File, str::FromStr};
+use std::env;
+use std::{f64, str::FromStr};
 
 fn escape_time(c: Complex<f64>, limit: usize) -> Option<usize> {
     let mut z = Complex { re: 0.0, im: 0.0 };
@@ -95,7 +94,25 @@ fn write_image(file_name: &str, pixels: &[u8], bounds: (usize, usize)) -> Result
 }
 
 fn main() {
-    println!("Hello, world!");
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() != 5 {
+        eprintln!("Usage: {} FILE PIXELS UPPERLEFT LOWERRIGHT", args[0]);
+        eprintln!(
+            "Example: {} mandel.png 1000x750 -1.20,0.35 -1,0.20",
+            args[0]
+        );
+        std::process::exit(1);
+    }
+
+    let bounds = parse_pair::<usize>(&args[2], "x").expect("Error parsing PIXELS");
+    let upper_left = parse_complex(&args[3]).expect("Error parsing UPPERLEFT");
+    let lower_right = parse_complex(&args[4]).expect("Error parsing LOWERRIGHT");
+    let mut pixels = vec![0; bounds.0 * bounds.1];
+
+    render(&mut pixels, bounds, upper_left, lower_right);
+
+    write_image(&args[1], &pixels, bounds).expect("Error writing PNG file");
 }
 
 #[test]
