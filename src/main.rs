@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{f64, str::FromStr};
 
 use num_complex::Complex;
 
@@ -28,6 +28,14 @@ fn parse_pair<T: FromStr>(s: &str, delim: &str) -> Option<(T, T)> {
     })
 }
 
+/// Parse a pair of floating point into a complex num
+fn parse_complex(s: &str) -> Option<Complex<f64>> {
+    match parse_pair(s, ",") {
+        Some((re, im)) => Some(Complex { re, im }),
+        _ => None,
+    }
+}
+
 fn main() {
     println!("Hello, world!");
 }
@@ -40,4 +48,12 @@ fn test_parse_pair() {
     assert_eq!(parse_pair::<i32>(",100", ","), None);
     assert_eq!(parse_pair::<f64>("10,20xy", ","), None);
     assert_eq!(parse_pair::<f64>("0.5x1.5", "x"), Some((0.5, 1.5)));
+}
+
+#[test]
+fn test_parse_complex_num() {
+    assert_eq!(
+        parse_complex("-8,17.5"),
+        Some(Complex::<f64> { re: -8.0, im: 17.5 })
+    );
 }
