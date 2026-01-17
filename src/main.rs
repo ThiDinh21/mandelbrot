@@ -39,7 +39,7 @@ fn parse_complex(s: &str) -> Option<Complex<f64>> {
 /// Convert RowxCol of img -> XxY on the complex plane
 /// `bounds`: width and height of img in pixels
 /// `pixel`: (col, row) of the point on img in pixels
-/// `upper_left` and `lower_right`: determines the region of the complex plane that the image covers
+/// `upper_left` and `lower_right`: determine the region of the complex plane that the image covers
 fn pixel_to_point(
     bounds: (usize, usize),
     pixel: (usize, usize),
@@ -53,6 +53,29 @@ fn pixel_to_point(
     Complex {
         re: upper_left.re + pixel.0 as f64 * width / bounds.0 as f64,
         im: upper_left.im - pixel.1 as f64 * height / bounds.1 as f64,
+    }
+}
+
+/// `pixels`: a buffer to store a rectangle of the Mandelbrot set
+/// `bounds`: width and height of the pixels puffer
+/// `upper_left` and `lower_right`: specify the points on the complex plane corresponding to the
+/// upper left and lower right of the pixels buffer
+fn render(
+    pixels: &mut [u8],
+    bounds: (usize, usize),
+    upper_left: Complex<f64>,
+    lower_right: Complex<f64>,
+) {
+    assert!(pixels.len() == bounds.0 * bounds.1);
+
+    for row in 0..bounds.1 {
+        for col in 0..bounds.0 {
+            let point = pixel_to_point(bounds, (col, row), upper_left, lower_right);
+            pixels[row * bounds.0 + col] = match escape_time(point, 255) {
+                Some(count) => 255 - count as u8,
+                None => 0,
+            }
+        }
     }
 }
 
