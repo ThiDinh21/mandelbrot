@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use num_complex::Complex;
 
 fn escape_time(c: Complex<f64>, limit: usize) -> Option<usize> {
@@ -11,6 +13,31 @@ fn escape_time(c: Complex<f64>, limit: usize) -> Option<usize> {
     None
 }
 
+/// Parse str s into a pair of coord x and y, separated by a delim
+/// i.e. "300x400", "5.0,8.0"
+/// x and y must have FromStr implemented. Returns a pair Some(x, y), any other cases return None
+fn parse_pair<T: FromStr>(s: &str, delim: &str) -> Option<(T, T)> {
+    s.find(delim).map_or(None, |index| {
+        match (T::from_str(&s[..index]), T::from_str(&s[index + 1..])) {
+            (Ok(x), Ok(y)) => Some((x, y)),
+            _ => {
+                dbg!(&s[index + 1..]);
+                None
+            }
+        }
+    })
+}
+
 fn main() {
     println!("Hello, world!");
+}
+
+#[test]
+fn test_parse_pair() {
+    assert_eq!(parse_pair::<i32>("", ","), None);
+    assert_eq!(parse_pair::<i32>("10,", ","), None);
+    assert_eq!(parse_pair::<i32>("10,100", ","), Some((10, 100)));
+    assert_eq!(parse_pair::<i32>(",100", ","), None);
+    assert_eq!(parse_pair::<f64>("10,20xy", ","), None);
+    assert_eq!(parse_pair::<f64>("0.5x1.5", "x"), Some((0.5, 1.5)));
 }
