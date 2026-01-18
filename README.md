@@ -35,4 +35,4 @@ cargo run output.png 4000x3000 -1.20,0.35 -1,0.20
 
 <p>&nbsp</p>
 
-_This project was developed as a learning exercise following the book **Programming Rust** by Blandy, Orendorff, and Tindall._
+_This project was developed as a learning exercise following the book "Programming Rust" by Blandy, Orendorff, and Tindall._
