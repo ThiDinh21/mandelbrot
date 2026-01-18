@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 num-complex = "0.4"
 image = "0.25.9"
+crossbeam = "0.8.4"
